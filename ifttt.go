@@ -1,10 +1,12 @@
 package main
 
 import (
+    "github.com/joho/godotenv"
     "fmt"
     "time"
     "net/http"
     "encoding/json"
+    "os"
 )
 
 type VersionResponse struct {
@@ -16,13 +18,26 @@ type AddressResponse struct {
 }
 
 func main() {
+    if _, err := os.Stat(".env"); err == nil {
+        err := godotenv.Load()
+        must(err)
+    }
+
+    port, set := os.LookupEnv("IFTTT_PORT")
+    if !set {
+        port = "3693"
+    }
+    host, set := os.LookupEnv("IFTTT_HOST")
+    if !set {
+        host = "localhost"
+    }
     fmt.Println("-------------------")
     fmt.Println("If Tangle Then That")
     fmt.Println("-------------------")
-    fmt.Println("Listening on port http://localhost:3693\n")
+    fmt.Printf("Listening on http://%s:%s\n", host, port)
     http.HandleFunc("/", home)
     http.HandleFunc("/address", getAddress)
-    http.ListenAndServe(":3693", nil)
+    http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -52,4 +67,10 @@ func sendJsonResponse(w http.ResponseWriter, r *http.Request, js []byte) {
     w.Header().Set("Server", "If Tangle Then That - 0.1")
     w.Header().Set("Content-Type", "application/json")
     w.Write(js)
+}
+
+func must(err error) {
+    if err != nil {
+        panic(err)
+    }
 }
