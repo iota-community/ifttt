@@ -16,3 +16,4 @@ environment variables on your system without a .env file.
  - `IFTTT_HOST`: The hostname to listen on, defaults to `localhost`
  - `IFTTT_PORT`: The port to listen on, defaults to `3693`
  - `IFTTT_SEED`: The account seed, required to run this program.
+ - `IFTTT_NODE_URI`: The node to connect to, for example `https://nodes.devnet.thetangle.org:443`
