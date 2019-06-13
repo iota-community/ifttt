@@ -14,15 +14,15 @@ To use this demo, you need the following:
 
 Before you run the app, you need to configure it with the following settings:
 
-	- `IFTTT_SEED`: The account seed, required to run this program.
-	- `IFTTT_NODE_URI`: The node to connect to, for example `https://nodes.devnet.thetangle.org:443`
+- `IFTTT_SEED`: The account seed, required to run this program.
+- `IFTTT_NODE_URI`: The node to connect to, for example `https://nodes.devnet.thetangle.org:443`
 
 To configure these settings, you can either put them in a `.env` file or set them as environment variables on your system.
 
 As well as these settings, you can also configure the following optional ones:
 
-	- `IFTTT_HOST`: The hostname to listen on, defaults to `localhost`
-	- `IFTTT_PORT`: The port to listen on, defaults to `3693`
+- `IFTTT_HOST`: The hostname to listen on, defaults to `localhost`
+- `IFTTT_PORT`: The port to listen on, defaults to `3693`
  
  ## 2. Customize the callback
  
