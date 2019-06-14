@@ -1,6 +1,6 @@
 # If Tangle Then That
 
-This small Go application creates a client library [account](https://docs.iota.org/docs/iota-go/0.1/how-to-guides/create-account) with your seed and exposes an API that generates conditional deposit addresses (CDA) and magnet links.
+This small Go application creates a client library [account](https://docs.iota.org/docs/iota-go/0.1/how-to-guides/create-account) with your seed and exposes an API that allows you to generate conditional deposit addresses (CDA) and magnet links.
 
 You can also create a callback to monitor those CDAs for changes such as incoming transactions. This allows you to easily trigger real-world actions based on Tangle messages.
 
