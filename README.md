@@ -1,6 +1,8 @@
 # If Tangle Then That
 
-This small Go application creates a server that allows you to generate addresses for a seed and monitor those addresses for changes. If a transaction is sent to one of those addresses it will trigger a to-be-defined callback. This allows you to easily trigger real-world actions based on Tangle messages.
+This small Go application is a server that creates a client library [account](https://docs.iota.org/docs/iota-go/0.1/how-to-guides/create-account) with your seed.
+
+You can use the API to generate conditional deposit addresses (CDA) and magnet links. You can also create a callback to monitor those CDAs for changes such as incoming transactions. This allows you to easily trigger real-world actions based on Tangle messages.
 
 ## Prerequisites
 
@@ -26,7 +28,7 @@ As well as these settings, you can also configure the following optional ones:
  
  ## 2. Customize the callback
  
-If a transaction is sent to one of your addresses, this action will trigger a callback. By default, the callback prints the value of the transaction's `signatureMessageFragment` field to the console.
+If a transaction is sent to one of your CDAs, this action will trigger a callback. By default, the callback prints the value of the transaction's `signatureMessageFragment` field to the console.
 
 To customize this callback, edit the following function in the `ifttt.go` file:
  
@@ -37,7 +39,7 @@ lis := listener.NewCallbackEventListener(em)
 		for _, tx := range bun {
 			msg, err := converter.TrytesToASCII(removeSuffixNine(tx.SignatureMessageFragment))
 			if err == nil {
-    // Customize the callback here
+    				// Customize the callback here
 				fmt.Println("Message: ", msg)
 			}
 		}
@@ -64,5 +66,12 @@ lis := listener.NewCallbackEventListener(em)
 	go run ifttt.go
 	```
 	
+	The server is now listening on `IFTTT_HOST`:`IFTTT_PORT`.
+	
+4. To get a new CDA and a magnet link, send a `GET` request to the `address` endpoint. For example, you can open a browser, and enter `localhost:3693/address`
+
+	![GET address endpoint](address-endpoint.png)
+	
+	**Note:** The output may look different in your browser. This example uses the [JSON viewer Chrome extension](https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh) to make the output easier to read.
 
 
