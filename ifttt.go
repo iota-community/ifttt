@@ -23,6 +23,10 @@ type VersionResponse struct {
     Version string `json:"version"`
 }
 
+type DepositResponse struct {
+    TailHash string `json:"tailhash"`
+}
+
 type AddressResponse struct {
     Address string `json:"address"`
     Cda string `json:"cda"`
@@ -48,7 +52,6 @@ func main() {
 	em := event.NewEventMachine()
 
     timesource := timesrc.NewNTPTimeSource("time.google.com")
-	
 	acc, err = builder.NewBuilder().
 		WithAPI(iotaAPI).
 		WithStore(store).
@@ -61,7 +64,6 @@ func main() {
 	must(err)
 
 	defer acc.Shutdown()
-    
 	must(acc.Start())
 
 	lis := listener.NewCallbackEventListener(em)
@@ -69,12 +71,12 @@ func main() {
 		fmt.Println("Receiving Deposit!")
 		for _, tx := range bun {
 			msg, err := converter.TrytesToASCII(removeSuffixNine(tx.SignatureMessageFragment))
+            fmt.Println(tx.CurrentIndex, tx.Value)
 			if err == nil {
 				fmt.Println("Message: ", msg)
 			}
 		}
 	})
-	
 	balance, err := acc.AvailableBalance()
 	must(err)
 	fmt.Println("Balance:", balance, "i")
@@ -93,6 +95,7 @@ func main() {
     fmt.Printf("Listening on http://%s:%s\n", host, port)
     http.HandleFunc("/", home)
     http.HandleFunc("/address", getAddress)
+    http.HandleFunc("/withdraw", withdraw)
     http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil)
 }
 
@@ -101,8 +104,28 @@ func home(w http.ResponseWriter, r *http.Request) {
     sendJsonResponse(w, r, data)
 }
 
+func withdraw(w http.ResponseWriter, r *http.Request) {
+    // Withdraw all available funds
+    // Needs another mechanism to prevent accidental address re-use
+    // Work in progress
+    withdraw_address, set := os.LookupEnv("IFTTT_WITHDRAW")
+    if set && len(withdraw_address) != 90 {
+        http.Error(w, "Please set a withdrawal address including checksum in the IFTTT_WITHDRAW environment variable first", http.StatusInternalServerError)
+        return
+    }
+    balance, err := acc.AvailableBalance()
+    transfer := bundle.Transfer{withdraw_address, balance, "WITHDRAWAL", "IFTTT"}
+    bundle, err := acc.Send(transfer)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    os.Unsetenv("IFTTT_WITHDRAW")
+    data := DepositResponse{bundle[0].Hash}
+    sendJsonResponse(w, r, data)
+}
+
 func getAddress(w http.ResponseWriter, r *http.Request) {
-    // Placeholder, should generate a new address for us!
     timesource := timesrc.NewNTPTimeSource("time.google.com")
 	now, err := timesource.Time()
 	must(err)
